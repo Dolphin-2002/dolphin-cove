@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/../config.php';
 $currentUser = getCurrentUser();
 $flash = getFlash();
 $currentPage = basename($_SERVER['PHP_SELF'], '.php');
