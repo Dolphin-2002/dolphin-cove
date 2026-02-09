@@ -26,6 +26,63 @@ if ($viewUsername) {
 $isOwnProfile = ($profileUser['id'] == $userId);
 $profileUserId = $profileUser['id'];
 
+// Check connection status with this user (if not own profile)
+$connectionStatus = null;
+$connectionDirection = null; // 'sent' or 'received'
+if (!$isOwnProfile) {
+    $connCheckStmt = $db->prepare("SELECT * FROM connections WHERE (requester_id = ? AND receiver_id = ?) OR (requester_id = ? AND receiver_id = ?) LIMIT 1");
+    $connCheckStmt->bind_param("iiii", $userId, $profileUserId, $profileUserId, $userId);
+    $connCheckStmt->execute();
+    $connRow = $connCheckStmt->get_result()->fetch_assoc();
+    $connCheckStmt->close();
+    if ($connRow) {
+        $connectionStatus = $connRow['status'];
+        $connectionDirection = ($connRow['requester_id'] == $userId) ? 'sent' : 'received';
+    }
+}
+
+// Handle profile actions (connect, accept, remove)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$isOwnProfile) {
+    $profileAction = $_POST['action'] ?? '';
+    
+    if ($profileAction === 'connect') {
+        $stmt = $db->prepare("INSERT IGNORE INTO connections (requester_id, receiver_id, status) VALUES (?, ?, 'pending')");
+        $stmt->bind_param("ii", $userId, $profileUserId);
+        $stmt->execute();
+        $stmt->close();
+        // Send notification
+        $notifMsg = 'sent you a connection request';
+        $notifLink = SITE_URL . '/network.php?tab=pending';
+        $nStmt = $db->prepare("INSERT INTO notifications (user_id, from_user_id, type, message, link) VALUES (?, ?, 'connection_request', ?, ?)");
+        $nStmt->bind_param("iiss", $profileUserId, $userId, $notifMsg, $notifLink);
+        $nStmt->execute();
+        $nStmt->close();
+        setFlash('success', 'Connection request sent!');
+        header("Location: " . SITE_URL . "/profile.php?username=" . urlencode($profileUser['username']));
+        exit;
+    }
+    
+    if ($profileAction === 'accept') {
+        $stmt = $db->prepare("UPDATE connections SET status = 'accepted' WHERE requester_id = ? AND receiver_id = ? AND status = 'pending'");
+        $stmt->bind_param("ii", $profileUserId, $userId);
+        $stmt->execute();
+        $stmt->close();
+        setFlash('success', 'Connection accepted!');
+        header("Location: " . SITE_URL . "/profile.php?username=" . urlencode($profileUser['username']));
+        exit;
+    }
+    
+    if ($profileAction === 'remove') {
+        $stmt = $db->prepare("DELETE FROM connections WHERE (requester_id = ? AND receiver_id = ?) OR (requester_id = ? AND receiver_id = ?)");
+        $stmt->bind_param("iiii", $userId, $profileUserId, $profileUserId, $userId);
+        $stmt->execute();
+        $stmt->close();
+        setFlash('success', 'Connection removed');
+        header("Location: " . SITE_URL . "/profile.php?username=" . urlencode($profileUser['username']));
+        exit;
+    }
+}
+
 // Handle profile update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $isOwnProfile) {
     if (($_POST['action'] ?? '') === 'update_profile') {
@@ -135,6 +192,26 @@ require_once __DIR__ . '/includes/header.php';
             <div class="profile-actions">
                 <?php if ($isOwnProfile): ?>
                     <button class="btn btn-secondary" onclick="document.getElementById('edit-modal').style.display='flex'">✏️ Edit Profile</button>
+                <?php else: ?>
+                    <?php if ($connectionStatus === 'accepted'): ?>
+                        <a href="<?= SITE_URL ?>/messages.php?chat=<?= $profileUserId ?>" class="btn btn-primary">💬 Message</a>
+                        <form method="POST" style="display:inline">
+                            <input type="hidden" name="action" value="remove">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Remove this connection?')">Remove</button>
+                        </form>
+                    <?php elseif ($connectionStatus === 'pending' && $connectionDirection === 'sent'): ?>
+                        <button class="btn btn-outline" disabled>⏳ Request Sent</button>
+                    <?php elseif ($connectionStatus === 'pending' && $connectionDirection === 'received'): ?>
+                        <form method="POST" style="display:inline">
+                            <input type="hidden" name="action" value="accept">
+                            <button type="submit" class="btn btn-primary">✅ Accept Request</button>
+                        </form>
+                    <?php else: ?>
+                        <form method="POST" style="display:inline">
+                            <input type="hidden" name="action" value="connect">
+                            <button type="submit" class="btn btn-primary">+ Connect</button>
+                        </form>
+                    <?php endif; ?>
                 <?php endif; ?>
             </div>
         </div>
