@@ -617,6 +617,15 @@ h4 { font-size: 1.05rem; font-weight: 600; }
 }
 .comment-header strong { font-size: 0.85rem; }
 .comment-time { font-size: 0.75rem; color: var(--text-muted); }
+.comment-actions { margin-top: 0.25rem; }
+.comment-like-btn {
+    background: none; border: none; cursor: pointer; font-size: 0.75rem;
+    color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.25rem;
+    padding: 0.15rem 0.35rem; border-radius: 6px; transition: all 0.2s;
+}
+.comment-like-btn:hover { background: var(--bg-hover); }
+.comment-like-btn.liked { color: #ef4444; }
+.comment-like-btn span { font-size: 0.75rem; }
 .comment-form,
 .comment-input {
     display: flex; gap: 0.5rem; margin-top: 0.5rem; align-items: center;

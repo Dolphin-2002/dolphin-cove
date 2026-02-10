@@ -206,8 +206,10 @@ CREATE TABLE IF NOT EXISTS task_milestones (
   title VARCHAR(200) NOT NULL,
   description TEXT DEFAULT NULL,
   due_date DATE DEFAULT NULL,
+  amount DECIMAL(10,2) DEFAULT 0,
   status ENUM('pending','in_progress','completed') DEFAULT 'pending',
   completed_at DATETIME DEFAULT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

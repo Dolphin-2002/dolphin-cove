@@ -1,9 +1,7 @@
 <?php
 require_once __DIR__ . '/config.php';
-$_SESSION['user_id'] = null;
-unset($_SESSION['user_id']);
 
-// Update online status
+// Update online status BEFORE destroying the session
 if (isset($_SESSION['user_id'])) {
     $db = getDB();
     $stmt = $db->prepare("UPDATE users SET is_online = 0, last_seen = NOW() WHERE id = ?");
@@ -12,6 +10,8 @@ if (isset($_SESSION['user_id'])) {
     $stmt->close();
 }
 
+$_SESSION['user_id'] = null;
+unset($_SESSION['user_id']);
 session_destroy();
 session_start();
 setFlash('success', 'You have been logged out');
