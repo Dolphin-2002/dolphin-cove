@@ -12,7 +12,7 @@ echo "<p><strong>PHP Version:</strong> " . phpversion() . "</p>";
 // Test database connection
 echo "<h3>Database Connection Test</h3>";
 
-$host = 'sql113.infinityfree.com';
+$host = 'sql307.infinityfree.com';
 $user = 'if0_41119955';
 $pass = 'BF82cLjlhMCesk';
 $dbname = 'if0_41119955_dolphin_cove';

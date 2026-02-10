@@ -1,10 +1,12 @@
 -- ============================================================================
 -- DOLPHIN COVE - MySQL Database Schema
--- Import this via phpMyAdmin or mysql CLI
+-- Import this via phpMyAdmin on InfinityFree
+-- DO NOT use CREATE DATABASE on shared hosting - select your database first
 -- ============================================================================
 
-CREATE DATABASE IF NOT EXISTS dolphin_cove CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE dolphin_cove;
+-- Remove these lines if importing on InfinityFree (the database already exists)
+-- CREATE DATABASE IF NOT EXISTS dolphin_cove CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- USE dolphin_cove;
 
 -- ============================================================================
 -- USERS TABLE

@@ -13,7 +13,7 @@ if ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.
     // IMPORTANT: Get these values from your InfinityFree Control Panel > MySQL Databases
     // DB_HOST: shown as "MySQL hostname" in control panel (e.g. sql113.infinityfree.com)
     // DB_NAME: your database name with prefix (e.g. if0_41119955_dolphin_cove)
-    define('DB_HOST', 'sql113.infinityfree.com');
+    define('DB_HOST', 'sql307.infinityfree.com');
     define('DB_USER', 'if0_41119955');
     define('DB_PASS', 'BF82cLjlhMCesk');
     define('DB_NAME', 'if0_41119955_dolphin_cove');
