@@ -44,9 +44,9 @@ $filter = $_GET['filter'] ?? '';
 
 $where = "";
 if ($filter === 'freelance') {
-    $where = " AND p.is_freelance = 1";
+    $where = " AND p.is_freelance_post = 1";
 } elseif ($filter === 'regular') {
-    $where = " AND p.is_freelance = 0";
+    $where = " AND p.is_freelance_post = 0";
 }
 
 $sql = "SELECT p.*, u.display_name AS author_name, u.username AS author_username, u.avatar_url,
@@ -106,13 +106,13 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
                 <div class="post-content">
                     <p><?= nl2br(e($post['content'])) ?></p>
-                    <?php if ($post['image_url']): ?>
-                    <img src="<?= e($post['image_url']) ?>" alt="" class="post-image">
+                    <?php if ($post['image']): ?>
+                    <img src="<?= e($post['image']) ?>" alt="" class="post-image">
                     <?php endif; ?>
                 </div>
-                <?php if ($post['skills']): ?>
+                <?php if ($post['freelance_skills']): ?>
                 <div class="job-skills">
-                    <?php foreach (explode(',', $post['skills']) as $sk): $sk = trim($sk); if ($sk): ?>
+                    <?php foreach (explode(',', $post['freelance_skills']) as $sk): $sk = trim($sk); if ($sk): ?>
                     <span class="skill-chip"><?= e($sk) ?></span>
                     <?php endif; endforeach; ?>
                 </div>

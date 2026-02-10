@@ -94,7 +94,7 @@ $discoverSQL = "SELECT u.* FROM users u
                 )";
 $discoverParams = [$userId, $userId, $userId, $userId];
 $discoverTypes = "iiii";
-if ($search && $tab === 'discover') {
+if ($search) {
     $discoverSQL .= " AND (u.display_name LIKE ? OR u.username LIKE ? OR u.skills LIKE ?)";
     $s = "%$search%";
     $discoverParams[] = $s;
@@ -128,9 +128,22 @@ require_once __DIR__ . '/includes/header.php';
 
         <form class="filter-bar" method="GET">
             <input type="hidden" name="tab" value="<?= e($tab) ?>">
-            <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search people..." class="search-input">
+            <input type="text" name="search" value="<?= e($search) ?>" placeholder="Search by name or username..." class="search-input">
             <button type="submit" class="btn btn-primary">Search</button>
+            <?php if ($search): ?>
+                <a href="?tab=<?= e($tab) ?>" class="btn btn-outline btn-sm">Clear</a>
+            <?php endif; ?>
         </form>
+
+        <?php
+        // If searching on connections tab and no results found, suggest discover tab
+        if ($search && $tab === 'connections' && empty($connections)):
+        ?>
+        <div class="empty-state">
+            <p>No connections found matching "<strong><?= e($search) ?></strong>"</p>
+            <a href="?tab=discover&search=<?= urlencode($search) ?>" class="btn btn-primary" style="margin-top:0.5rem">🔍 Search in Discover</a>
+        </div>
+        <?php endif; ?>
 
         <?php if ($tab === 'connections'): ?>
         <?php if (empty($connections)): ?>

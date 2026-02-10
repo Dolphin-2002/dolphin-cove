@@ -6,7 +6,7 @@ define('DB_PASS', '');
 define('DB_NAME', 'dolphin_cove');
 
 // Site configuration
-define('SITE_URL', 'http://localhost/dolphin-cove/dolphin-dolphin-cove');
+define('SITE_URL', 'http://localhost/dolphin-cove');
 define('SITE_NAME', 'Dolphin Cove');
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
 define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB

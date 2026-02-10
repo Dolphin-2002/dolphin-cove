@@ -106,6 +106,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         exit;
     }
 
+    if ($_POST['action'] === 'like_comment') {
+        $commentId = (int)$_POST['comment_id'];
+        $stmt = $db->prepare("SELECT id FROM comment_likes WHERE comment_id = ? AND user_id = ?");
+        $stmt->bind_param("ii", $commentId, $userId);
+        $stmt->execute();
+        $exists = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        if ($exists) {
+            $stmt = $db->prepare("DELETE FROM comment_likes WHERE comment_id = ? AND user_id = ?");
+        } else {
+            $stmt = $db->prepare("INSERT INTO comment_likes (comment_id, user_id) VALUES (?, ?)");
+        }
+        $stmt->bind_param("ii", $commentId, $userId);
+        $stmt->execute();
+        $stmt->close();
+        header("Location: " . SITE_URL . "/home.php");
+        exit;
+    }
+
     if ($_POST['action'] === 'delete_post') {
         $postId = (int)$_POST['post_id'];
         $stmt = $db->prepare("DELETE FROM posts WHERE id = ? AND author_id = ?");
@@ -243,7 +262,10 @@ require_once __DIR__ . '/includes/header.php';
 
                 <?php foreach ($posts as $post):
                     // Get comments for this post
-                    $commentsResult = $db->query("SELECT c.*, u.display_name, u.username, u.avatar_url FROM comments c JOIN users u ON c.author_id = u.id WHERE c.post_id = {$post['id']} ORDER BY c.created_at ASC");
+                    $commentsResult = $db->query("SELECT c.*, u.display_name, u.username, u.avatar_url,
+                        (SELECT COUNT(*) FROM comment_likes WHERE comment_id = c.id) AS comment_like_count,
+                        (SELECT COUNT(*) FROM comment_likes WHERE comment_id = c.id AND user_id = $userId) AS user_liked_comment
+                        FROM comments c JOIN users u ON c.author_id = u.id WHERE c.post_id = {$post['id']} ORDER BY c.created_at ASC");
                     $comments = $commentsResult->fetch_all(MYSQLI_ASSOC);
                     $hasLiked = $post['user_liked'] > 0;
                     $isSaved = $post['user_saved'] > 0;
@@ -362,6 +384,18 @@ require_once __DIR__ . '/includes/header.php';
                                         <span class="comment-time"><?= timeAgo($comment['created_at']) ?></span>
                                     </div>
                                     <p><?= e($comment['content']) ?></p>
+                                    <div class="comment-actions">
+                                        <form method="POST" style="display:inline">
+                                            <input type="hidden" name="action" value="like_comment">
+                                            <input type="hidden" name="comment_id" value="<?= $comment['id'] ?>">
+                                            <button type="submit" class="comment-like-btn <?= $comment['user_liked_comment'] ? 'liked' : '' ?>">
+                                                <?= $comment['user_liked_comment'] ? '❤️' : '🤍' ?>
+                                                <?php if ($comment['comment_like_count'] > 0): ?>
+                                                <span><?= $comment['comment_like_count'] ?></span>
+                                                <?php endif; ?>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                             <?php endforeach; ?>
