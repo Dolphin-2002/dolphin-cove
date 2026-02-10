@@ -1,0 +1,13 @@
+# Security - disable directory listing
+Options -Indexes
+
+# Character encoding
+AddDefaultCharset UTF-8
+
+# Ensure PHP files are parsed
+<FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
+
+# Error handling
+ErrorDocument 500 "Internal Server Error - Check debug.php for details"

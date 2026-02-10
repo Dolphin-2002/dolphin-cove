@@ -1,12 +1,24 @@
 <?php
 // Database configuration
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'dolphin_cove');
-
-// Site configuration
-define('SITE_URL', 'http://localhost/dolphin-cove');
+// Detect environment: InfinityFree or localhost
+if ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1') {
+    // Local XAMPP
+    define('DB_HOST', 'localhost');
+    define('DB_USER', 'root');
+    define('DB_PASS', '');
+    define('DB_NAME', 'dolphin_cove');
+    define('SITE_URL', 'http://localhost/dolphin-cove');
+} else {
+    // InfinityFree hosting
+    // IMPORTANT: Get these values from your InfinityFree Control Panel > MySQL Databases
+    // DB_HOST: shown as "MySQL hostname" in control panel (e.g. sql113.infinityfree.com)
+    // DB_NAME: your database name with prefix (e.g. if0_41119955_dolphin_cove)
+    define('DB_HOST', 'sql113.infinityfree.com');
+    define('DB_USER', 'if0_41119955');
+    define('DB_PASS', 'BF82cLjlhMCesk');
+    define('DB_NAME', 'if0_41119955_dolphin_cove');
+    define('SITE_URL', 'https://dolphin-cove.page.gd');
+}
 define('SITE_NAME', 'Dolphin Cove');
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
 define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
@@ -127,5 +139,5 @@ function userAvatar(?string $avatar, string $name, string $size = 'small'): stri
 
 // Create uploads directory if it doesn't exist
 if (!is_dir(UPLOAD_DIR)) {
-    mkdir(UPLOAD_DIR, 0755, true);
+    @mkdir(UPLOAD_DIR, 0755, true);
 }

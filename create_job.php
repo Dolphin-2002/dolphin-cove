@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $attachmentUrl = null;
         if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = __DIR__ . '/uploads/jobs/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+            if (!is_dir($uploadDir)) @mkdir($uploadDir, 0755, true);
             $ext = pathinfo($_FILES['attachment']['name'], PATHINFO_EXTENSION);
             $fn = 'job_' . time() . '_' . uniqid() . '.' . $ext;
             move_uploaded_file($_FILES['attachment']['tmp_name'], $uploadDir . $fn);
